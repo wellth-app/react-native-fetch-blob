@@ -277,16 +277,79 @@
     }
 }
 
-+(NSString *) getHeaderIgnoreCases:(NSString *)field fromHeaders:(NSMutableDictionary *) headers {
-
-    NSString * normalCase = [headers valueForKey:field];
-    NSString * ignoredCase = [headers valueForKey:[field lowercaseString]];
-    if( normalCase != nil)
-        return normalCase;
-    else
-        return ignoredCase;
-
++ (void)buildJSONRequest:(NSDictionary *)options
+                  taskId:(NSString *)taskId
+                  method:(NSString *)method
+                     url:(NSString *)url
+                 headers:(NSDictionary *)headers
+                    body:(id)body
+              onComplete:(void (^)(NSURLRequest *req, long bodyLength))onComplete {
+    NSString *methodName = [method lowercaseString];
+    __block NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
+    __block NSMutableDictionary *normalizedHeaders = [[NSMutableDictionary alloc] initWithDictionary:[RNFetchBlobNetwork normalizeHeaders:headers]];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        if ([methodName isEqualToString:@"post"]
+            || [methodName isEqualToString:@"put"]
+            || [methodName isEqualToString:@"patch"]) {
+            NSData *requestBody = [self normalizedJSONRequestBody:body];
+            [request setHTTPBody:requestBody];
+            [request setHTTPMethod:method];
+            [request setAllHTTPHeaderFields:normalizedHeaders];
+            return onComplete(request, [requestBody length]);
+        }
+        
+        onComplete(request, 0);
+    });
 }
 
++ (NSString *)getHeaderIgnoreCases:(NSString *)field fromHeaders:(NSMutableDictionary *)headers {
+    NSString *normalCase = [headers valueForKey:field];
+    NSString *ignoredCase = [headers valueForKey:[field lowercaseString]];
+    if (normalCase != nil) {
+        return normalCase;
+    } else {
+        return ignoredCase;
+    }
+}
+
++ (NSData *)normalizedJSONRequestBody:(id)body {
+    return [NSJSONSerialization dataWithJSONObject:[self normalizeValue:body]
+                                           options:NSJSONWritingPrettyPrinted
+                                             error:nil];
+}
+
++ (NSString *)dataForFile:(NSString *)filePath {
+    NSString *originalFilePath = [filePath substringFromIndex:[FILE_PREFIX length]];
+    NSData *fileData = [NSData dataWithContentsOfFile:[RNFetchBlobFS getPathOfAsset:originalFilePath]];
+    return [fileData base64EncodedStringWithOptions:0];
+}
+
++ (id)normalizeValue:(id)value {
+    if ([value isKindOfClass:[NSDictionary class]]) {
+        NSDictionary *dictionaryValue = (NSDictionary*)value;
+        NSMutableDictionary *normalizedDictionary = [NSMutableDictionary new];
+        for (NSString *key in [dictionaryValue allKeys]) {
+            normalizedDictionary[key] = [self normalizeValue:dictionaryValue[key]];
+        }
+        
+        return normalizedDictionary;
+    } else if ([value isKindOfClass:[NSArray class]]) {
+        NSArray *arrayValue = (NSArray*)value;
+        NSMutableArray *normalizedArray = [NSMutableArray new];
+        for (id element in arrayValue) {
+            [normalizedArray addObject:[self normalizeValue:element]];
+        }
+        
+        return normalizedArray;
+    } else if ([value isKindOfClass:[NSString class]]) {
+        NSString *stringValue = (NSString*)value;
+        if ([stringValue hasPrefix:FILE_PREFIX]) {
+            return [self dataForFile:stringValue];
+        }
+    }
+    
+    return value;
+}
 
 @end
