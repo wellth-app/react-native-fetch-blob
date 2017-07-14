@@ -22,6 +22,9 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.network.ForwardingCookieHandler;
 import com.facebook.react.modules.network.CookieJarContainer;
 import com.facebook.react.modules.network.OkHttpClientProvider;
+
+import org.json.JSONException;
+
 import okhttp3.OkHttpClient;
 import okhttp3.JavaNetCookieJar;
 
@@ -339,7 +342,11 @@ public class RNFetchBlob extends ReactContextBaseJavaModule {
     public void fetchBlobJSON(ReadableMap options, String taskId, String method, String url, ReadableMap headers, ReadableMap body, final Callback callback) {
         Log.d(TAG, "fetchBlobJSON() called!");
         Log.d(TAG, "JSON payload was " + (body != null ? "not" : "") + " null!");
-        Log.d(TAG, "JSON payload was = " + RNJSONUtils.convertMapToJson(body).toString());
+        try {
+            Log.d(TAG, "JSON payload was = " + RNJSONUtils.convertMapToJson(body).toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         new RNFetchBlobReq(options, taskId, method, url, headers, body, mClient, callback).run();
     }
 
