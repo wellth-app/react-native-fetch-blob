@@ -1,5 +1,7 @@
 package com.RNFetchBlob.Utils;
 
+import android.util.Log;
+
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
@@ -15,6 +17,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.Iterator;
 
+import static android.content.ContentValues.TAG;
 import static com.RNFetchBlob.RNFetchBlobConst.FILE_PREFIX;
 import static com.facebook.react.bridge.ReadableType.Array;
 import static com.facebook.react.bridge.ReadableType.Map;
@@ -116,11 +119,13 @@ public class RNJSONUtils {
                     object.put(key, readableMap.getDouble(key));
                     break;
                 case String:
-
                     if (key.equalsIgnoreCase("base64")) {
+                        Log.d(TAG, "Found the base64 file key!");
                         final String value = readableMap.getString(key);
                         if (value.contains(FILE_PREFIX)) {
+                            Log.d(TAG, "Found the base64 file key with the file prefix: " + FILE_PREFIX);
                             final String filePath = value.substring(value.lastIndexOf(FILE_PREFIX) + 1);
+                            Log.d(TAG, "Extracted file path = " + filePath);
                             final File file = new File(filePath);
                             object.put(key, EncodeUtils.encodeFileToBase64Binary(file));
                         } else {
@@ -129,7 +134,6 @@ public class RNJSONUtils {
                     } else {
                         object.put(key, readableMap.getString(key));
                     }
-
                     break;
                 case Map:
                     object.put(key, convertMapToJson(readableMap.getMap(key)));

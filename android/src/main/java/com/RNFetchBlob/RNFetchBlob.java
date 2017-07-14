@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
+import com.RNFetchBlob.Utils.RNJSONUtils;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -33,6 +35,8 @@ import static android.app.Activity.RESULT_OK;
 import static com.RNFetchBlob.RNFetchBlobConst.GET_CONTENT_INTENT;
 
 public class RNFetchBlob extends ReactContextBaseJavaModule {
+
+    public static final String TAG = "RNFetchBlob";
 
     // Cookies
     private final ForwardingCookieHandler mCookieHandler;
@@ -333,6 +337,9 @@ public class RNFetchBlob extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void fetchBlobJSON(ReadableMap options, String taskId, String method, String url, ReadableMap headers, ReadableMap body, final Callback callback) {
+        Log.d(TAG, "fetchBlobJSON() called!");
+        Log.d(TAG, "JSON payload was " + (body != null ? "not" : "") + " null!");
+        Log.d(TAG, "JSON payload was = " + RNJSONUtils.convertMapToJson(body).toString());
         new RNFetchBlobReq(options, taskId, method, url, headers, body, mClient, callback).run();
     }
 
