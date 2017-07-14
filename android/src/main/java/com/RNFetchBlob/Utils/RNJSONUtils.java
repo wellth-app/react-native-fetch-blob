@@ -124,7 +124,7 @@ public class RNJSONUtils {
                         final String value = readableMap.getString(key);
                         if (value.contains(FILE_PREFIX)) {
                             Log.d(TAG, "Found the base64 file key with the file prefix: " + FILE_PREFIX);
-                            final String filePath = value.substring(value.lastIndexOf(FILE_PREFIX) + 1);
+                            final String filePath = value.substring(FILE_PREFIX.length());
                             Log.d(TAG, "Extracted file path = " + filePath);
                             final File file = new File(filePath);
                             object.put(key, EncodeUtils.encodeFileToBase64Binary(file));
