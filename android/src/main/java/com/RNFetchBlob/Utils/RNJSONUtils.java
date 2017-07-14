@@ -74,34 +74,34 @@ public class RNJSONUtils {
         return array;
     }
 
-    public static JSONObject convertMapToJson(ReadableMap readableMap) throws JSONException {
-        JSONObject object = new JSONObject();
-        ReadableMapKeySetIterator iterator = readableMap.keySetIterator();
-        while (iterator.hasNextKey()) {
-            String key = iterator.nextKey();
-            switch (readableMap.getType(key)) {
-                case Null:
-                    object.put(key, JSONObject.NULL);
-                    break;
-                case Boolean:
-                    object.put(key, readableMap.getBoolean(key));
-                    break;
-                case Number:
-                    object.put(key, readableMap.getDouble(key));
-                    break;
-                case String:
-                    object.put(key, readableMap.getString(key));
-                    break;
-                case Map:
-                    object.put(key, convertMapToJson(readableMap.getMap(key)));
-                    break;
-                case Array:
-                    object.put(key, convertArrayToJson(readableMap.getArray(key)));
-                    break;
-            }
-        }
-        return object;
-    }
+//    public static JSONObject convertMapToJson(ReadableMap readableMap) throws JSONException {
+//        JSONObject object = new JSONObject();
+//        ReadableMapKeySetIterator iterator = readableMap.keySetIterator();
+//        while (iterator.hasNextKey()) {
+//            String key = iterator.nextKey();
+//            switch (readableMap.getType(key)) {
+//                case Null:
+//                    object.put(key, JSONObject.NULL);
+//                    break;
+//                case Boolean:
+//                    object.put(key, readableMap.getBoolean(key));
+//                    break;
+//                case Number:
+//                    object.put(key, readableMap.getDouble(key));
+//                    break;
+//                case String:
+//                    object.put(key, readableMap.getString(key));
+//                    break;
+//                case Map:
+//                    object.put(key, convertMapToJson(readableMap.getMap(key)));
+//                    break;
+//                case Array:
+//                    object.put(key, convertArrayToJson(readableMap.getArray(key)));
+//                    break;
+//            }
+//        }
+//        return object;
+//    }
 
     public static JSONObject convertMapToJsonBase64(ReadableMap readableMap) throws JSONException {
         JSONObject object = new JSONObject();
@@ -136,7 +136,7 @@ public class RNJSONUtils {
                     }
                     break;
                 case Map:
-                    object.put(key, convertMapToJson(readableMap.getMap(key)));
+                    object.put(key, convertMapToJsonBase64(readableMap.getMap(key)));
                     break;
                 case Array:
                     object.put(key, convertArrayToJson(readableMap.getArray(key)));
@@ -162,7 +162,7 @@ public class RNJSONUtils {
                     array.put(readableArray.getString(i));
                     break;
                 case Map:
-                    array.put(convertMapToJson(readableArray.getMap(i)));
+                    array.put(convertMapToJsonBase64(readableArray.getMap(i)));
                     break;
                 case Array:
                     array.put(convertArrayToJson(readableArray.getArray(i)));

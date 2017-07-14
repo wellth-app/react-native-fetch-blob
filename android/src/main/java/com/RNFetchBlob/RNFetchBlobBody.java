@@ -112,7 +112,7 @@ public class RNFetchBlobBody extends RequestBody{
 
         if (body != null) {
             try {
-                final JSONObject bodyObject = RNJSONUtils.convertMapToJson(body);
+                final JSONObject bodyObject = RNJSONUtils.convertMapToJsonBase64(body);
                 this.rawBody = bodyObject.toString();
             } catch (JSONException e) {
                 e.printStackTrace();

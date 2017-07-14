@@ -343,7 +343,7 @@ public class RNFetchBlob extends ReactContextBaseJavaModule {
         Log.d(TAG, "fetchBlobJSON() called!");
         Log.d(TAG, "JSON payload was " + (body != null ? "not" : "") + " null!");
         try {
-            Log.d(TAG, "JSON payload was = " + RNJSONUtils.convertMapToJson(body).toString());
+            Log.d(TAG, "JSON payload was = " + RNJSONUtils.convertMapToJsonBase64(body).toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
