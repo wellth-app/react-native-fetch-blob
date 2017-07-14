@@ -124,15 +124,15 @@ public class RNFetchBlobBody extends RequestBody{
 
         try {
             switch (requestType) {
+                case JSONDocument:
+                    contentLength = this.rawBody.getBytes().length;
+                    requestStream = new ByteArrayInputStream(this.rawBody.getBytes());
+                    break;
                 case SingleFile:
                     requestStream = getReuqestStream();
                     contentLength = requestStream.available();
                     break;
                 case AsIs:
-                    contentLength = this.rawBody.getBytes().length;
-                    requestStream = new ByteArrayInputStream(this.rawBody.getBytes());
-                    break;
-                case JSONDocument:
                     contentLength = this.rawBody.getBytes().length;
                     requestStream = new ByteArrayInputStream(this.rawBody.getBytes());
                     break;
