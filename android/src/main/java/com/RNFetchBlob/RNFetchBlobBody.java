@@ -2,12 +2,16 @@ package com.RNFetchBlob;
 
 import android.util.Base64;
 
+import com.RNFetchBlob.Utils.RNJSONUtils;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -26,6 +30,7 @@ public class RNFetchBlobBody extends RequestBody{
     InputStream requestStream;
     long contentLength = 0;
     ReadableArray form;
+    ReadableMap formMap;
     String mTaskId;
     String rawBody;
     RNFetchBlobReq.RequestType requestType;
@@ -101,6 +106,45 @@ public class RNFetchBlobBody extends RequestBody{
             RNFetchBlobUtils.emitWarningEvent("RNFetchBlob failed to create request multipart body :" + ex.getLocalizedMessage());
         }
         return this;
+    }
+
+    RNFetchBlobBody setBody(ReadableMap body) {
+
+        if (body != null) {
+            try {
+                final JSONObject bodyObject = RNJSONUtils.convertMapToJson(body);
+                this.rawBody = bodyObject.toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            this.rawBody = "";
+            requestType = RNFetchBlobReq.RequestType.AsIs;
+        }
+
+        try {
+            switch (requestType) {
+                case SingleFile:
+                    requestStream = getReuqestStream();
+                    contentLength = requestStream.available();
+                    break;
+                case AsIs:
+                    contentLength = this.rawBody.getBytes().length;
+                    requestStream = new ByteArrayInputStream(this.rawBody.getBytes());
+                    break;
+                case JSONDocument:
+                    contentLength = this.rawBody.getBytes().length;
+                    requestStream = new ByteArrayInputStream(this.rawBody.getBytes());
+                    break;
+                case Others:
+                    break;
+            }
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            RNFetchBlobUtils.emitWarningEvent("RNFetchBlob failed to create single content request body :" + ex.getLocalizedMessage() + "\r\n");
+        }
+        return this;
+
     }
 
     @Override
