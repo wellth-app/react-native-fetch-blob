@@ -54,6 +54,7 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
     enum RequestType  {
         Form,
         SingleFile,
+        JSONDocument,
         AsIs,
         WithoutBody,
         Others
@@ -83,6 +84,7 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
     String rawRequestBody;
     String destPath;
     ReadableArray rawRequestBodyArray;
+    ReadableMap rawRequestBodyMap;
     ReadableMap headers;
     Callback callback;
     long contentLength;
@@ -112,13 +114,32 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
         else
             responseType = ResponseType.KeepInMemory;
 
-
         if (body != null)
             requestType = RequestType.SingleFile;
         else if (arrayBody != null)
             requestType = RequestType.Form;
         else
             requestType = RequestType.WithoutBody;
+    }
+
+    // This is for the map
+    public RNFetchBlobReq(ReadableMap options, String taskId, String method, String url, ReadableMap headers, ReadableMap mapBody, OkHttpClient client, final Callback callback) {
+        this.method = method.toUpperCase();
+        this.options = new RNFetchBlobConfig(options);
+        this.taskId = taskId;
+        this.url = url;
+        this.headers = headers;
+        this.callback = callback;
+        this.rawRequestBodyMap = mapBody;
+        this.client = client;
+
+        if(this.options.fileCache || this.options.path != null)
+            responseType = ResponseType.FileStorage;
+        else
+            responseType = ResponseType.KeepInMemory;
+
+        requestType = RequestType.JSONDocument;
+
     }
 
     public static void cancelTask(String taskId) {
@@ -258,6 +279,14 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
 
             // set request body
             switch (requestType) {
+                case JSONDocument:
+                    requestBody = new RNFetchBlobBody(taskId)
+                            .chunkedEncoding(isChunkedRequest)
+                            .setRequestType(requestType)
+                            .setBody(rawRequestBodyMap)
+                            .setMIME(MediaType.parse("application/javascript"));
+                    builder.method(method, requestBody);
+                    break;
                 case SingleFile:
                     requestBody = new RNFetchBlobBody(taskId)
                             .chunkedEncoding(isChunkedRequest)
