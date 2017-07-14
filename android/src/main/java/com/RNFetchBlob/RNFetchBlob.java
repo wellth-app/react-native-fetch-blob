@@ -332,6 +332,11 @@ public class RNFetchBlob extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void fetchBlobJSON(ReadableMap options, String taskId, String method, String url, ReadableMap headers, ReadableMap body, final Callback callback) {
+        new RNFetchBlobReq(options, taskId, method, url, headers, body, mClient, callback).run();
+    }
+
+    @ReactMethod
     public void getContentIntent(String mime, Promise promise) {
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
         if(mime != null)
