@@ -69,12 +69,12 @@
 				A19B48241D98102400E6868A /* RNFetchBlobProgress.m */,
 				A19B48231D98100800E6868A /* RNFetchBlobProgress.h */,
 				A1F950181D7E9134002A95A6 /* IOS7Polyfill.h */,
-				A1AAE2981D300E4D0051D11C /* RNFetchBlobReqBuilder.m */,
 				A1AAE2971D300E3E0051D11C /* RNFetchBlobReqBuilder.h */,
-				A158F42F1D0539DB006FFD38 /* RNFetchBlobNetwork.m */,
+				A1AAE2981D300E4D0051D11C /* RNFetchBlobReqBuilder.m */,
 				A158F42E1D0539CE006FFD38 /* RNFetchBlobNetwork.h */,
-				A158F42C1D0535BB006FFD38 /* RNFetchBlobConst.m */,
+				A158F42F1D0539DB006FFD38 /* RNFetchBlobNetwork.m */,
 				A158F4291D0534A9006FFD38 /* RNFetchBlobConst.h */,
+				A158F42C1D0535BB006FFD38 /* RNFetchBlobConst.m */,
 				A158F4281D052E57006FFD38 /* RNFetchBlobFS.h */,
 				A158F4261D052E49006FFD38 /* RNFetchBlobFS.m */,
 				A15C30111CD25C330074CB35 /* RNFetchBlob.h */,
@@ -251,12 +251,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Libraries/**",
-					"$(SRCROOT)/../node_modules/react-native/React/**",
-					"$(SRCROOT)/../../React/**",
-					"$(SRCROOT)/../../react-native/React/**",
 					"$(SRCROOT)/../../node_modules/react-native/React/**",
-					"$(SRCROOT)/../../node_modules/react-native-fetch-blob/ios/RNFetchBlob",
-					"$(SRCROOT)/../../RNFetchBlobTest/node_modules/react-native/**",
+					"$(SRCROOT)/../../node_modules/react-native-fetch-blob/ios/RNFetchBlob/**",
+					"$(SRCROOT)/../../node_modules/react-native/**",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -272,12 +269,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Libraries/**",
-					"$(SRCROOT)/../node_modules/react-native/React/**",
-					"$(SRCROOT)/../../React/**",
-					"$(SRCROOT)/../../react-native/React/**",
 					"$(SRCROOT)/../../node_modules/react-native/React/**",
-					"$(SRCROOT)/../../node_modules/react-native-fetch-blob/ios/RNFetchBlob",
-					"$(SRCROOT)/../../RNFetchBlobTest/node_modules/react-native/**",
+					"$(SRCROOT)/../../node_modules/react-native-fetch-blob/ios/RNFetchBlob/**",
+					"$(SRCROOT)/../../node_modules/react-native/**",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";

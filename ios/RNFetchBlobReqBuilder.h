@@ -11,26 +11,34 @@
 
 #import <Foundation/Foundation.h>
 
-@interface RNFetchBlobReqBuilder : NSObject;
+@interface RNFetchBlobReqBuilder : NSObject
+;
 
-+(void) buildMultipartRequest:(NSDictionary *)options
++ (void)buildMultipartRequest:(NSDictionary *)options
                        taskId:(NSString *)taskId
                        method:(NSString *)method
                           url:(NSString *)url
                       headers:(NSDictionary *)headers
                          form:(NSArray *)form
-                   onComplete:(void(^)(NSURLRequest * req, long bodyLength))onComplete;
+                   onComplete:(void (^)(NSURLRequest *req, long bodyLength))onComplete;
 
-+(void) buildOctetRequest:(NSDictionary *)options
++ (void)buildOctetRequest:(NSDictionary *)options
                    taskId:(NSString *)taskId
                    method:(NSString *)method
                       url:(NSString *)url
                   headers:(NSDictionary *)headers
                      body:(NSString *)body
-               onComplete:(void(^)(NSURLRequest * req, long bodyLength))onComplete;
+               onComplete:(void (^)(NSURLRequest *req, long bodyLength))onComplete;
 
-+(NSString *) getHeaderIgnoreCases:(NSString *)field fromHeaders:(NSMutableArray *) headers;
++ (void)buildJSONRequest:(NSDictionary *)options
+                  taskId:(NSString *)taskId
+                  method:(NSString *)method
+                     url:(NSString *)url
+                 headers:(NSDictionary *)headers
+                    body:(id)body
+              onComplete:(void (^)(NSURLRequest *req, long bodyLength))onComplete;
 
++ (NSString *)getHeaderIgnoreCases:(NSString *)field fromHeaders:(NSMutableArray *)headers;
 
 @end
 

@@ -79,27 +79,16 @@ RCT_EXPORT_METHOD(fetchBlobForm:(NSDictionary *)options
                   form:(NSArray *)form
                   callback:(RCTResponseSenderBlock)callback)
 {
-
     [RNFetchBlobReqBuilder buildMultipartRequest:options
                                           taskId:taskId
                                           method:method
                                              url:url
                                          headers:headers
                                             form:form
-                                      onComplete:^(__weak NSURLRequest *req, long bodyLength)
-    {
-        // something went wrong when building the request body
-        if(req == nil)
-        {
-            callback(@[@"RNFetchBlob.fetchBlobForm failed to create request body"]);
-        }
-        // send HTTP request
-        else
-        {
-            RNFetchBlobNetwork * utils = [[RNFetchBlobNetwork alloc] init];
-            [utils sendRequest:options contentLength:bodyLength bridge:self.bridge taskId:taskId withRequest:req callback:callback];
-        }
-    }];
+                                      onComplete:[self completionBlockFor:@"fetchBlobForm"
+                                                           requestOptions:options
+                                                                   taskId:taskId
+                                                                 callback:callback]];
 
 }
 
@@ -110,28 +99,56 @@ RCT_EXPORT_METHOD(fetchBlob:(NSDictionary *)options
                   method:(NSString *)method
                   url:(NSString *)url
                   headers:(NSDictionary *)headers
-                  body:(NSString *)body callback:(RCTResponseSenderBlock)callback)
+                  body:(NSString *)body
+                  callback:(RCTResponseSenderBlock)callback)
 {
     [RNFetchBlobReqBuilder buildOctetRequest:options
-                                      taskId:taskId
-                                      method:method
-                                         url:url
-                                     headers:headers
-                                        body:body
-                                  onComplete:^(NSURLRequest *req, long bodyLength)
-    {
-        // something went wrong when building the request body
-        if(req == nil)
-        {
-            callback(@[@"RNFetchBlob.fetchBlob failed to create request body"]);
+                                     taskId:taskId
+                                     method:method
+                                        url:url
+                                    headers:headers
+                                       body:body
+                                 onComplete:[self completionBlockFor:@"fetchBlob"
+                                                      requestOptions:options
+                                                              taskId:taskId
+                                                            callback:callback]];
+}
+
+RCT_EXPORT_METHOD(fetchBlobJSON:(NSDictionary *)options
+                  taskId:(NSString *)taskId
+                  method:(NSString *)method
+                  url:(NSString *)url
+                  headers:(NSDictionary *)headers
+                  body:(id)body
+                  callback:(RCTResponseSenderBlock)callback) {
+    [RNFetchBlobReqBuilder buildJSONRequest:options
+                                     taskId:taskId
+                                     method:method
+                                        url:url
+                                    headers:headers
+                                       body:body
+                                 onComplete:[self completionBlockFor:@"fetchBlobJSON"
+                                                      requestOptions:options
+                                                              taskId:taskId
+                                                            callback:callback]];
+}
+
+-(void(^)(NSURLRequest*, long))completionBlockFor:(NSString *)methodName requestOptions:(NSDictionary *)options taskId:(NSString*)taskId callback:(RCTResponseSenderBlock)callback {
+    __block typeof(self) this = self;
+    return ^(NSURLRequest *req, long bodyLength) {
+        if(req == nil) {
+            NSString *errorString = [NSString stringWithFormat:@"RNFetchBlob.%@ failed to create request body", methodName];
+            callback(@[errorString]);
+        } else {
+            RNFetchBlobNetwork *network = [[RNFetchBlobNetwork alloc] init];
+            [network sendRequest:options
+                   contentLength:bodyLength
+                          bridge:this.bridge
+                          taskId:taskId
+                     withRequest:req
+                        callback:callback];
         }
-        // send HTTP request
-        else
-        {
-            __block RNFetchBlobNetwork * utils = [[RNFetchBlobNetwork alloc] init];
-            [utils sendRequest:options contentLength:bodyLength bridge:self.bridge taskId:taskId withRequest:req callback:callback];
-        }
-    }];
+    };
 }
 
 #pragma mark - fs.createFile
