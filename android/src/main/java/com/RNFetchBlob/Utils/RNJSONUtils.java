@@ -12,8 +12,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.Iterator;
 
+import static com.RNFetchBlob.RNFetchBlobConst.FILE_PREFIX;
 import static com.facebook.react.bridge.ReadableType.Array;
 import static com.facebook.react.bridge.ReadableType.Map;
 
@@ -86,6 +88,48 @@ public class RNJSONUtils {
                     break;
                 case String:
                     object.put(key, readableMap.getString(key));
+                    break;
+                case Map:
+                    object.put(key, convertMapToJson(readableMap.getMap(key)));
+                    break;
+                case Array:
+                    object.put(key, convertArrayToJson(readableMap.getArray(key)));
+                    break;
+            }
+        }
+        return object;
+    }
+
+    public static JSONObject convertMapToJsonBase64(ReadableMap readableMap) throws JSONException {
+        JSONObject object = new JSONObject();
+        ReadableMapKeySetIterator iterator = readableMap.keySetIterator();
+        while (iterator.hasNextKey()) {
+            String key = iterator.nextKey();
+            switch (readableMap.getType(key)) {
+                case Null:
+                    object.put(key, JSONObject.NULL);
+                    break;
+                case Boolean:
+                    object.put(key, readableMap.getBoolean(key));
+                    break;
+                case Number:
+                    object.put(key, readableMap.getDouble(key));
+                    break;
+                case String:
+
+                    if (key.equalsIgnoreCase("base64")) {
+                        final String value = readableMap.getString(key);
+                        if (value.contains(FILE_PREFIX)) {
+                            final String filePath = value.substring(value.lastIndexOf(FILE_PREFIX) + 1);
+                            final File file = new File(filePath);
+                            object.put(key, EncodeUtils.encodeFileToBase64Binary(file));
+                        } else {
+                            object.put(key, readableMap.getString(key));
+                        }
+                    } else {
+                        object.put(key, readableMap.getString(key));
+                    }
+
                     break;
                 case Map:
                     object.put(key, convertMapToJson(readableMap.getMap(key)));
