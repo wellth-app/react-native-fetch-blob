@@ -20,7 +20,8 @@ public class EncodeUtils {
             FileInputStream fileInputStreamReader = new FileInputStream(file);
             byte[] bytes = new byte[(int)file.length()];
             fileInputStreamReader.read(bytes);
-            encodedfile = Base64.encodeBase64(bytes).toString();
+            final byte[] byteArr = Base64.encodeBase64(bytes);
+            encodedfile = new String(byteArr);
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
