@@ -119,8 +119,6 @@ public class RNJSONUtils {
                     object.put(key, readableMap.getDouble(key));
                     break;
                 case String:
-                    if (key.equalsIgnoreCase("base64")) {
-                        Log.d(TAG, "Found the base64 file key!");
                         final String value = readableMap.getString(key);
                         if (value.contains(FILE_PREFIX)) {
                             Log.d(TAG, "Found the base64 file key with the file prefix: " + FILE_PREFIX + " and value = " + value);
@@ -131,9 +129,6 @@ public class RNJSONUtils {
                         } else {
                             object.put(key, readableMap.getString(key));
                         }
-                    } else {
-                        object.put(key, readableMap.getString(key));
-                    }
                     break;
                 case Map:
                     object.put(key, convertMapToJsonBase64(readableMap.getMap(key)));
