@@ -123,7 +123,7 @@ public class RNJSONUtils {
                         Log.d(TAG, "Found the base64 file key!");
                         final String value = readableMap.getString(key);
                         if (value.contains(FILE_PREFIX)) {
-                            Log.d(TAG, "Found the base64 file key with the file prefix: " + FILE_PREFIX);
+                            Log.d(TAG, "Found the base64 file key with the file prefix: " + FILE_PREFIX + " and value = " + value);
                             final String filePath = value.substring(FILE_PREFIX.length());
                             Log.d(TAG, "Extracted file path = " + filePath);
                             final File file = new File(filePath);
