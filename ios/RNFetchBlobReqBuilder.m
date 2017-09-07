@@ -344,7 +344,7 @@
         return normalizedArray;
     } else if ([value isKindOfClass:[NSString class]]) {
         NSString *stringValue = (NSString*)value;
-        if ([stringValue hasPrefix:FILE_PREFIX]) {
+        if ([stringValue containsString:FILE_PREFIX]) {
             return [self dataForFile:stringValue];
         }
     }

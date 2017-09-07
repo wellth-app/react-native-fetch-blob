@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Base64;
 
 import com.RNFetchBlob.Response.RNFetchBlobDefaultResp;
 import com.RNFetchBlob.Response.RNFetchBlobFileResp;
+import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -21,6 +23,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.modules.network.OkHttpClientProvider;
+import com.facebook.react.modules.network.TLSSocketFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,11 +38,14 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.ConnectionPool;
+import okhttp3.ConnectionSpec;
 import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -48,6 +54,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.TlsVersion;
+
 
 public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
 
@@ -169,8 +177,15 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
                 if(options.addAndroidDownloads.hasKey("path")) {
                     req.setDestinationUri(Uri.parse("file://" + options.addAndroidDownloads.getString("path")));
                 }
+                // #391 Add MIME type to the request
+                if(options.addAndroidDownloads.hasKey("mime")) {
+                    req.setMimeType(options.addAndroidDownloads.getString("mime"));
+                }
                 // set headers
                 ReadableMapKeySetIterator it = headers.keySetIterator();
+                if(options.addAndroidDownloads.hasKey("mediaScannable") && options.addAndroidDownloads.hasKey("mediaScannable") == true ) {
+                    req.allowScanningByMediaScanner();
+                }
                 while (it.hasNextKey()) {
                     String key = it.nextKey();
                     req.addRequestHeader(key, headers.getString(key));
@@ -388,9 +403,10 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
             clientBuilder.retryOnConnectionFailure(false);
             clientBuilder.followRedirects(options.followRedirect);
             clientBuilder.followSslRedirects(options.followRedirect);
+            clientBuilder.retryOnConnectionFailure(true);
 
+            OkHttpClient client = enableTls12OnPreLollipop(clientBuilder).build();
 
-            OkHttpClient client = clientBuilder.retryOnConnectionFailure(true).build();
             Call call =  client.newCall(req);
             taskTable.put(taskId, call);
             call.enqueue(new okhttp3.Callback() {
@@ -665,16 +681,20 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
                         return;
                     }
                     String contentUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-                    if (contentUri != null) {
+                    if ( contentUri != null &&
+                            options.addAndroidDownloads.hasKey("mime") &&
+                            options.addAndroidDownloads.getString("mime").contains("image")) {
                         Uri uri = Uri.parse(contentUri);
                         Cursor cursor = appCtx.getContentResolver().query(uri, new String[]{android.provider.MediaStore.Images.ImageColumns.DATA}, null, null, null);
-                        // use default destination of DownloadManager
+
+                            // use default destination of DownloadManager
                         if (cursor != null) {
                             cursor.moveToFirst();
                             filePath = cursor.getString(0);
                         }
                     }
                 }
+
                 // When the file is not found in media content database, check if custom path exists
                 if (options.addAndroidDownloads.hasKey("path")) {
                     try {
@@ -699,6 +719,29 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
 
             }
         }
+    }
+
+    public static OkHttpClient.Builder enableTls12OnPreLollipop(OkHttpClient.Builder client) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+            try {
+                client.sslSocketFactory(new TLSSocketFactory());
+
+                ConnectionSpec cs = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                        .tlsVersions(TlsVersion.TLS_1_2)
+                        .build();
+
+                List< ConnectionSpec > specs = new ArrayList < > ();
+                specs.add(cs);
+                specs.add(ConnectionSpec.COMPATIBLE_TLS);
+                specs.add(ConnectionSpec.CLEARTEXT);
+
+                client.connectionSpecs(specs);
+            } catch (Exception exc) {
+                FLog.e("OkHttpClientProvider", "Error while enabling TLS 1.2", exc);
+            }
+        }
+
+        return client;
     }
 
 
