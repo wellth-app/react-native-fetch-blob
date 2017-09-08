@@ -299,7 +299,7 @@ public class RNFetchBlobReq extends BroadcastReceiver implements Runnable {
                             .chunkedEncoding(isChunkedRequest)
                             .setRequestType(requestType)
                             .setBody(rawRequestBodyMap)
-                            .setMIME(MediaType.parse("application/javascript"));
+                            .setMIME(MediaType.parse("application/json"));
                     builder.method(method, requestBody);
                     break;
                 case SingleFile:
