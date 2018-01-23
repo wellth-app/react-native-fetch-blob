@@ -250,8 +250,6 @@ NSOperationQueue *taskQueue;
             [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
         });
     }
-    
-    __block UIApplication * app = [UIApplication sharedApplication];
 }
 
 // #115 Invoke fetch.expire event on those expired requests so that the expired event can be handled
@@ -488,7 +486,7 @@ NSOperationQueue *taskQueue;
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-    })
+    });
 
     if(respInfo == nil)
     {
