@@ -340,6 +340,7 @@ public class RNFetchBlob extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void fetchBlobJSON(ReadableMap options, String taskId, String method, String url, ReadableMap headers, ReadableMap body, final Callback callback) {
+<<<<<<< HEAD
         Log.d(TAG, "New fetchBlobJSON() called!");
         Log.d(TAG, "JSON payload was " + (body != null ? "not" : "") + " null!");
         try {
@@ -347,6 +348,8 @@ public class RNFetchBlob extends ReactContextBaseJavaModule {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+=======
+>>>>>>> master
         new RNFetchBlobReq(options, taskId, method, url, headers, body, mClient, callback).run();
     }
 
