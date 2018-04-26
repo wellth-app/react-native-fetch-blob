@@ -245,10 +245,11 @@ NSOperationQueue *taskQueue;
     [task resume];
 
     // network status indicator
-    if([[options objectForKey:CONFIG_INDICATOR] boolValue] == YES)
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    __block UIApplication * app = [UIApplication sharedApplication];
-
+    if([[options objectForKey:CONFIG_INDICATOR] boolValue] == YES) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        });
+    }
 }
 
 // #115 Invoke fetch.expire event on those expired requests so that the expired event can be handled
@@ -483,7 +484,9 @@ NSOperationQueue *taskQueue;
     NSString * respStr = [NSNull null];
     NSString * rnfbRespType = @"";
 
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    });
 
     if(respInfo == nil)
     {
